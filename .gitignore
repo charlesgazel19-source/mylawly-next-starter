@@ -1,0 +1,21 @@
+# Node
+node_modules
+npm-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# Next
+.next
+out
+.vercel
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+.env.local
+
+# OS/editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json

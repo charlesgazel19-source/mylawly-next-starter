@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* -----------------------------------------------------------------------------
+   Thème + tokens (light/dark prêts)
+----------------------------------------------------------------------------- */
+:root {
+  --bg: #0f172a;         /* bg-slate-900 */
+  --panel: #111827;      /* bg-gray-900 */
+  --muted: #1f2937;      /* gray-800 */
+  --text: #f8fafc;       /* slate-50 */
+  --sub: #cbd5e1;        /* slate-300 */
+  --accent: #60a5fa;     /* sky-400 */
+  --ok: #34d399;         /* emerald-400 */
+  --warn: #fbbf24;       /* amber-400 */
+  --danger: #f87171;     /* red-400 */
+  color-scheme: dark;
+}
+
+.theme-light {
+  --bg: #ffffff;
+  --panel: #f8fafc;
+  --muted: #e5e7eb;
+  --text: #0f172a;
+  --sub: #334155;
+  --accent: #2563eb;
+  --ok: #16a34a;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+/* -----------------------------------------------------------------------------
+   Animations utilitaires (réutilisées partout)
+----------------------------------------------------------------------------- */
+@keyframes fadeIn { from { opacity:.0 } to { opacity:1 } }
+@keyframes slideIn { from { opacity:0; transform: translateY(8px) } to { opacity:1; transform: translateY(0) } }
+@keyframes pulseSoft { 0%,100%{opacity:.6} 50%{opacity:1} }
+.animate-fadeIn { animation: fadeIn .25s ease both; }
+.animate-slideIn { animation: slideIn .25s ease both; }
+.animate-pulse-soft { animation: pulseSoft 1.4s ease-in-out infinite; }
+
+/* Respecte l’accessibilité (réduit les mouvements si demandé) */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn, .animate-slideIn, .animate-pulse-soft { animation: none !important; }
+  * { scroll-behavior: auto !important; }
+}
+
+/* -----------------------------------------------------------------------------
+   Layer base : styles globaux sobres et sélecteurs natifs
+----------------------------------------------------------------------------- */
+@layer base {
+  ::selection { background: color-mix(in oklab, var(--accent) 30%, transparent); }
+  a { @apply underline-offset-2 hover:underline; }
+  input, textarea, select { color-scheme: inherit; }
+  /* Scrollbar (WebKit) */
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 8px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+}
+
+/* -----------------------------------------------------------------------------
+   Layer components : tes composants “Lawly UI” (prefix lw-)
+----------------------------------------------------------------------------- */
+@layer components {
+  .lw-topbar { @apply sticky top-0 z-40 flex items-center justify-between p-3 rounded-xl border border-muted bg-panel backdrop-blur supports-[backdrop-filter]:bg-panel/80; }
+  .lw-brand { @apply flex items-center gap-3; }
+  .lw-logo { background: linear-gradient(135deg,var(--accent),#22c55e); width:32px; height:32px; border-radius:8px; }
+
+  .lw-tabs { @apply flex gap-2; }
+  .lw-tab { @apply px-3 py-2 rounded-lg border border-muted text-sub transition-colors; }
+  .lw-tab-active { @apply border-[color:var(--accent)] text-text; }
+
+  .lw-panel { @apply border border-muted rounded-xl p-4 bg-panel; }
+
+  .lw-h { @apply uppercase tracking-wider text-sm text-sub font-semibold mb-2; }
+
+  .lw-card { @apply border border-muted rounded-xl p-3 bg-[#0b1220] flex flex-col gap-2 transition-transform duration-150; }
+  .lw-card:hover { transform: translateY(-1px); }
+
+  .lw-badge { @apply text-xs px-2 py-0.5 rounded-full border border-muted text-sub w-max; }
+
+  /* Boutons (focus-visible, disabled, variantes) */
+  .lw-btn {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-muted text-text transition-colors disabled:opacity-50;
+  }
+  .lw-btn-primary {
+    @apply bg-[color:var(--accent)] text-[#0a1326] font-bold hover:brightness-95;
+  }
+  .lw-btn-ghost {
+    @apply border-transparent bg-transparent hover:bg-[#0b1220] text-sub;
+  }
+  .lw-btn-danger {
+    @apply border-[color:var(--danger)] text-[color:var(--danger)] hover:bg-red-500/10;
+  }
+  .lw-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 45%, transparent);
+  }
+
+  /* Pills (statuts) */
+  .lw-pill { @apply text-xs px-2 py-1 rounded-full border border-muted text-sub; }
+  .lw-pill-ok { @apply border-[color:var(--ok)] text-[color:var(--ok)]; }
+  .lw-pill-warn { @apply border-[color:var(--warn)] text-[color:var(--warn)]; }
+  .lw-pill-danger { @apply border-[color:var(--danger)] text-[color:var(--danger)]; }
+
+  /* Champs de formulaire */
+  .lw-input {
+    @apply px-3 py-2 rounded-lg border border-muted bg-[#0b1220] text-text placeholder:text-sub/70 outline-none;
+  }
+  .lw-input:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 35%, transparent);
+  }
+
+  /* États “skeleton” */
+  .lw-skeleton { @apply bg-[#0f1627] rounded; }
+  .lw-skeleton-line { @apply lw-skeleton h-4 w-full animate-pulse-soft; }
+  .lw-skeleton-badge { @apply lw-skeleton h-5 w-20; }
+
+  /* Table sobre */
+  .lw-table { @apply w-full border-collapse text-sm; }
+  .lw-th { @apply border border-muted p-2 text-left bg-[#0b1220] text-sub; }
+  .lw-td { @apply border border-muted p-2; }
+}
+
+/* -----------------------------------------------------------------------------
+   Layer utilities : helpers transverses (layout, motion, etc.)
+----------------------------------------------------------------------------- */
+@layer utilities {
+  .container-app { @apply max-w-7xl mx-auto px-3 sm:px-4; }
+  .shadow-soft { box-shadow: 0 10px 25px -20px rgba(0,0,0,.5); }
+  .ring-accent { box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 35%, transparent); }
+  .text-sub { color: var(--sub); }
+  .bg-panel { background: var(--panel); }
+  .border-muted { border-color: var(--muted); }
+  .text-text { color: var(--text); }
+}
