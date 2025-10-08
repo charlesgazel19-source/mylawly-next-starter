@@ -122,10 +122,9 @@ export default function ModulePage() {
 
         // Extraction et log de l'id du document
         if (statusType === "completed") {
-          const docId = (json?.id as string | undefined) ?? (json?.document?.id as string | undefined) ?? null;
+          const docId = json?.id ?? json?.document?.id ?? null;
           console.log("computed docId", docId);
           if (!docId) {
-            console.error("no docId", json);
             setStatus("error");
             setMessage("Erreur : identifiant du document manquant. Veuillez réessayer.");
             // Ne pas rediriger
