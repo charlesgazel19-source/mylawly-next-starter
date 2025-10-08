@@ -1,25 +1,14 @@
-// app/api/documents/route.ts
-import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabaseServer } from "@/lib/supabase";
 
 // Helpers
 const ALLOWED_STATUS = new Set(["draft", "completed"]);
 const MAX_ANSWERS_BYTES = 200_000; // ~200 KB de réponses max par soumission
 
 function json(res: unknown, init?: number | ResponseInit) {
-  const opts: ResponseInit =
-    typeof init === "number" ? { status: init } : (init || {});
+  const opts: ResponseInit = typeof init === "number" ? { status: init } : init || {};
   return new Response(JSON.stringify(res), {
     ...opts,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      ...(opts.headers || {}),
-    },
+    headers: { "Content-Type": "application/json; charset=utf-8", ...(opts.headers || {}) },
   });
 }
 
@@ -59,6 +48,12 @@ function validateBody(body: any) {
 
 // POST /api/documents — créer un document
 export async function POST(req: Request) {
+  const supabase = supabaseServer();
+  if (!supabase) {
+    console.error("[POST /documents] Supabase environment variables are missing.");
+    return json({ error: "Configuration Supabase manquante." }, 500);
+  }
+
   try {
     // Sécurité simple: on refuse du non-JSON explicite
     const ct = req.headers.get("content-type") || "";
@@ -71,9 +66,7 @@ export async function POST(req: Request) {
     if (err) return badRequest(err);
 
     const { module_id, answers } = body;
-    const status: "draft" | "completed" = ALLOWED_STATUS.has(body.status)
-      ? body.status
-      : "draft";
+    const status: "draft" | "completed" = ALLOWED_STATUS.has(body.status) ? body.status : "draft";
 
     const { data, error } = await supabase
       .from("documents")
@@ -108,6 +101,12 @@ export async function POST(req: Request) {
 
 // GET /api/documents?limit=10&offset=0 — lister (pagination simple)
 export async function GET(req: Request) {
+  const supabase = supabaseServer();
+  if (!supabase) {
+    console.error("[GET /documents] Supabase environment variables are missing.");
+    return json({ error: "Configuration Supabase manquante." }, 500);
+  }
+
   try {
     const url = new URL(req.url);
     const limit = clamp(Number(url.searchParams.get("limit") ?? "10"), 1, 50);

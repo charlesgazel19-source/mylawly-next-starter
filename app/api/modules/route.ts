@@ -1,15 +1,21 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabaseServer } from "@/lib/supabase";
 
 export async function GET() {
+  const supabase = supabaseServer();
+  if (!supabase) {
+    console.error("[GET /api/modules] Supabase environment variables are missing.");
+    return new Response(
+      JSON.stringify({ error: "Configuration Supabase manquante." }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+      }
+    );
+  }
+
   const { data, error } = await supabase
     .from("modules")
-    .select("id,title,category,description,version,meta,updated_at")
+    .select("id,title,category,description,version,meta,updated_at,published")
     .eq("published", true)
     .order("updated_at", { ascending: false });
 
@@ -20,7 +26,7 @@ export async function GET() {
     });
   }
 
-  return new Response(JSON.stringify({ modules: data }), {
+  return new Response(JSON.stringify({ modules: data ?? [] }), {
     status: 200,
     headers: {
       "Content-Type": "application/json; charset=utf-8",

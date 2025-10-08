@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Topbar from "@/components/Topbar";
@@ -61,7 +61,7 @@ function ModuleCard({ m }: { m: Module }) {
 }
 
 /* --------------------------------- Page ----------------------------------- */
-export default function Page() {
+function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -288,5 +288,22 @@ export default function Page() {
         </aside>
       </div>
     </main>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#080c16] text-sub p-6">
+          <Topbar />
+          <p className="mt-10 text-center text-sm animate-pulse">
+            Chargement de l’interface…
+          </p>
+        </main>
+      }
+    >
+      <HomePageContent />
+    </Suspense>
   );
 }
