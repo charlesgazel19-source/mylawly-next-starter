@@ -120,14 +120,15 @@ export default function ModulePage() {
             : "✅ Document généré avec succès."
         );
 
-        // Safe extraction of document id
+        // Extraction et log de l'id du document
         if (statusType === "completed") {
-          const docId = (json?.id as string | undefined) ?? (json?.document?.id as string | undefined);
+          const docId = (json?.id as string | undefined) ?? (json?.document?.id as string | undefined) ?? null;
           console.log("computed docId", docId);
           if (!docId) {
-            console.error("Missing document id in POST response", json);
+            console.error("no docId", json);
             setStatus("error");
             setMessage("Erreur : identifiant du document manquant. Veuillez réessayer.");
+            // Ne pas rediriger
           } else {
             setTimeout(() => router.push(`/documents/${docId}`), 800);
           }

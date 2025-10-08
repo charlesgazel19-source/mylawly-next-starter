@@ -69,16 +69,20 @@ export async function POST(req: Request) {
     const status: "draft" | "completed" = ALLOWED_STATUS.has(body.status) ? body.status : "draft";
 
     const { data, error } = await supabase
-      .from("documents")
-      .insert([
-        {
-          module_id,
-          answers,
-          status,
-          // updated_at: now() sera mis par trigger SQL (cf. plus bas)
-        },
-      ])
-      .select("id, module_id, status, created_at, updated_at")
+        .from("documents")
+        .insert([
+          {
+            module_id,
+            answers,
+            status,
+            // Ajout des champs pour la structure
+            title: body.title ?? null,
+            description: body.description ?? null,
+            modules: body.modules ?? null,
+            user_id: body.user_id ?? null,
+          },
+        ])
+        .select("id, module_id, status, answers, title, description, modules, user_id, created_at")
       .single();
 
     if (error) {
