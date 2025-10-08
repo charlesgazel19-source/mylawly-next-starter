@@ -75,14 +75,12 @@ export async function POST(req: Request) {
             module_id,
             answers,
             status,
-            // Ajout des champs pour la structure
             title: body.title ?? null,
-            description: body.description ?? null,
             modules: body.modules ?? null,
             user_id: body.user_id ?? null,
           },
         ])
-        .select("id, module_id, status, answers, title, description, modules, user_id, created_at")
+        .select("id, module_id, status, answers, title, modules, user_id, created_at, updated_at")
       .single();
 
     if (error) {
@@ -92,7 +90,14 @@ export async function POST(req: Request) {
 
     // Normalize response: ensure top-level `id` exists for the frontend
     return json(
-      { id: data?.id, ...data },
+      {
+        id: data?.id,
+        module_id: data?.module_id,
+        status: data?.status,
+        created_at: data?.created_at,
+        updated_at: data?.updated_at,
+        user_id: data?.user_id,
+      },
       {
         status: 201,
         headers: {
