@@ -68,6 +68,8 @@ export async function POST(req: Request) {
     const { module_id, answers } = body;
     const status: "draft" | "completed" = ALLOWED_STATUS.has(body.status) ? body.status : "draft";
 
+    console.log("[POST /documents] incoming body:", { module_id, status, answersType: typeof answers, hasAnswers: !!answers });
+
     const { data, error } = await supabase
         .from("documents")
         .insert([
@@ -82,6 +84,8 @@ export async function POST(req: Request) {
         ])
         .select("id, module_id, status, answers, title, modules, user_id, created_at, updated_at")
       .single();
+
+    console.log("[POST /documents] insert result:", { data, error });
 
     if (error) {
       console.error("[POST /documents] Supabase error:", error);
