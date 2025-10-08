@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Topbar from "@/components/Topbar";
+import ErrorBanner from "@/components/ErrorBanner";
 
 /* -------------------------------------------------------------------------- */
 /*                                    Types                                   */
@@ -258,16 +259,11 @@ export default function ModulePage() {
           )}
 
           {/* Feedback utilisateur */}
-          {status !== "idle" && (
-            <p
-              className={`text-sm p-2 rounded-md transition-all duration-300 ${
-                status === "success"
-                  ? "text-green-400 bg-green-900/20"
-                  : "text-red-400 bg-red-900/20"
-              }`}
-            >
-              {message}
-            </p>
+          {status === "error" && message && (
+            <ErrorBanner message={message} />
+          )}
+          {status === "success" && message && (
+            <div className="text-green-700 bg-green-100 border border-green-400 px-4 py-2 rounded mb-2" role="status" aria-live="polite">{message}</div>
           )}
 
           {/* Boutons d’action */}
