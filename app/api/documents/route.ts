@@ -86,13 +86,17 @@ export async function POST(req: Request) {
       return json({ error: error.message }, 500);
     }
 
-    return json(data, {
-      status: 201,
-      headers: {
-        Location: `/api/documents/${data.id}`,
-        "Cache-Control": "no-store",
-      },
-    });
+    // Normalize response: ensure top-level `id` exists for the frontend
+    return json(
+      { id: data?.id, ...data },
+      {
+        status: 201,
+        headers: {
+          Location: `/api/documents/${data?.id}`,
+          "Cache-Control": "no-store",
+        },
+      }
+    );
   } catch (e: any) {
     console.error("[POST /documents] Unexpected:", e?.message || e);
     return json({ error: "Erreur serveur" }, 500);

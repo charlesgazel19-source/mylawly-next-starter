@@ -111,6 +111,7 @@ export default function ModulePage() {
 
         if (!res.ok) throw new Error("Erreur serveur");
         const json = await res.json();
+        console.log("POST /api/documents response", json);
 
         setStatus("success");
         setMessage(
@@ -119,12 +120,20 @@ export default function ModulePage() {
             : "✅ Document généré avec succès."
         );
 
-        // Future : rediriger automatiquement vers un aperçu
+        // Safe extraction of document id
         if (statusType === "completed") {
-          setTimeout(() => router.push(`/documents/${json.document?.id}`), 800);
+          const docId = (json?.id as string | undefined) ?? (json?.document?.id as string | undefined);
+          console.log("computed docId", docId);
+          if (!docId) {
+            console.error("Missing document id in POST response", json);
+            setStatus("error");
+            setMessage("Erreur : identifiant du document manquant. Veuillez réessayer.");
+          } else {
+            setTimeout(() => router.push(`/documents/${docId}`), 800);
+          }
         }
 
-        console.info("Document créé :", json.document);
+        console.info("Document créé :", json.document ?? json);
       } catch (err: any) {
         setStatus("error");
         setMessage(err.message || "Erreur lors de la sauvegarde.");
